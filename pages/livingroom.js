@@ -1,96 +1,188 @@
+/* eslint-disable prettier/prettier */
+/* eslint-disable quotes */
+/* eslint-disable no-trailing-spaces */
+/* eslint-disable semi */
+/* eslint-disable space-infix-ops */
+/* eslint-disable no-unused-vars */
+/* eslint-disable react/self-closing-comp */
 import 'react-native-gesture-handler';
-import React, { Component } from 'react';
-import {
-  View,
-  ScrollView,
-  Image,
-  StyleSheet, 
-  Text,
-  Slider
-} from 'react-native';
-import { Switch } from 'react-native-gesture-handler';
+import React, {Component} from 'react';
+import {View, ScrollView, Image, StyleSheet, Text, Slider} from 'react-native';
+import {Switch} from 'react-native-gesture-handler';
 
-
-export default class livingroom extends Component
-{
+export default class livingroom extends Component {
   constructor(props){
     super(props);
-    this.state={
+    this.api='http://192.168.1.12:5000'
+    this.state = {
+      rooom:1,
       lamp: "broken",
-      slideValue:15,
-      switchValue: false,
-      switchValue2: false
-    }
+      window:'broken',      
+      climatiseur:"broken",
+      temperature:0,
+      temp: 0,
+
+    };
+    // this.getRoom();  
     this.getLampState();
-    this.getLampState=this.getLampState.bind(this);
+    this.getTemperature();
+    this.getWindowState();
+
+    // this.getRoom=this.getRoom.bind(this)
+    this.getLampState=this.getLampState.bind(this)
+    this.getTemperature=this.getTemperature.bind(this);
+    this.getWindowState=this.getWindowState.bind(this);
+
+    this.changeLampState=this.changeLampState.bind(this) 
+    // this.handleTemperature=this.handleTemperature.bind(this) 
+    // this.handleTemperatureinput=this.handleTemperatureinput.bind(this) 
+    // this.changeTemperature=this.changeTemperature.bind(this) 
+    // this.changeAirConditionerState=this.changeAirConditionerState.bind(this) 
+    this.changeWindowState=this.changeWindowState.bind(this) 
   }
-  
+
+  getRoom(){
+    fetch(this.api+'/home/room').then(res=>res.json()).then(data=>{
+      this.setState({ rooom: data.room })
+    })
+    console.log(this.state.rooom)
+  }
+
   getLampState(){
-    fetch('http://192.168.1.12:5000/home/lamp').then(res=>res.json()).then(data=>{
-      this.setState({lamp: data.bedroom[0]})
+    fetch(this.api+'/home/lamp').then(res=>res.json()).then(data=>{
+      this.setState({ lamp: data.livingroom[this.state.rooom] })
     })
   }
-  // change=() =>
-  // {
-  //   return this.setState({lamp:"ON"});
-  // }
-  render()
-  {
-    return(
-    <View style={styles.container}>
-      {/* <ScrollView> */}
-         <Image
-         style={styles.img}
-         source={require('../images/LivingroomRoom.png')}
-         ></Image>
 
-         <View style={styles.device}>
-         <Text style={{fontSize:18, marginBottom:10}}>Temperature</Text>
-         <Text style={styles.deg}>{this.state.slideValue}°C</Text>
-         <Slider style={styles.slider} value={this.state.slideValue} minimumValue={15}
-                 maximumValue={50} step={1} minimumTrackTintColor='#FF8D8D' thumbTintColor='#FF8D8D' onValueChange={(slideValue) => this.setState({slideValue})} />
-         </View>
+  getTemperature(){
+    fetch(this.api+'/home/temperature').then(res=>res.json()).then(data=>{
+      this.setState({
+        temperature: data.temperature.livingroom[this.state.rooom],
+        temp: data.temperature.livingroom[this.state.rooom],
+        climatiseur: data.airConditioner.livingroom[this.state.rooom], 
+      })
+    })
+  }
 
-         <View style={styles.device}>
-           <Text style={{fontSize:18, marginBottom:10}}>Light : {this.state.lamp}</Text>
-           <Switch value={this.state.switchValue} onValueChange={(switchValue) => this.setState({switchValue})} />
-         </View>
+  getWindowState(){
+    fetch(this.api+'/home/window').then(res=>res.json()).then(data=>{
+      this.setState({ window: data.livingroom[this.state.rooom] })
+    })
+  }
 
-         <View style={styles.device}>
-           <Text style={{fontSize:18, marginBottom:10}}>Window : </Text>
-           <Switch value={this.state.switchValue2} onValueChange={(switchValue2) => this.setState({switchValue2})} />
-         </View>
-         
-      
-      {/* <Button title="change" onPress={this.change}></Button> */}
-      {/* </ScrollView> */}
-    </View>
+  render() {
+    return (
+      <View style={styles.container}>
+        {/* <ScrollView> */}
+        <Image
+          style={styles.img}
+          source={require('../images/LivingroomRoom.png')}></Image>
+
+          <View style={styles.device}>
+          <Text style={styles.text}>Temperature</Text>
+          <Text style={styles.deg}>{this.state.temperature}°C</Text>
+          <Slider 
+            style={styles.slider} 
+            value={this.state.temperature} 
+            minimumValue={15}
+            maximumValue={50} 
+            step={1} 
+            minimumTrackTintColor="#FF8D8D" 
+            thumbTintColor="#FF8D8D" 
+            // onValueChange={(slideValue) => this.setState({temperature:slideValue})} 
+          />
+        </View>
+
+        <View style={styles.device}>
+          <Text style={styles.text}>Light : {this.state.lamp}</Text>
+          <Switch 
+            value={this.state.lamp==="on"?true:false} 
+            onValueChange={this.changeLampState} 
+          />
+        </View>
+
+        <View style={styles.device}>
+          <Text style={styles.text}>Window : {this.state.window}</Text>
+          <Switch 
+            value={this.state.window==='opened'?true:false} 
+            onValueChange={this.changeWindowState} 
+          />
+        </View>
+
+
+
+        {/* <Button title="change" onPress={this.change}></Button> */}
+        {/* </ScrollView> */}
+      </View>
     );
+  }
+  changeLampState() {
+    fetch(this.api+'/change/lamp');
+    this.getLampState();
+    //console.log(this.state.temperature)
+  }
+
+  handleTemperature(value) {
+    this.setState({ temp: +value }); 
+    console.log('slider '+value)  
+    // this.changeTemperature(); 
+  }
+  handleTemperatureinput(e) {
+    this.setState({ temp: e.target.value }); 
+    console.log('input '+e.target.value)  
+    // this.changeTemperature(); 
+  }
+
+  // async changeTemperature() {
+  //   let result=await fetch('/change/temperature',{
+  //     'method':'POST',
+  //     'mode': 'no-cors',
+  //     'headers':{
+  //       'accept':'application/json',
+  //       'content-type':'application/json'
+  //     },
+  //     'body':JSON.stringify({
+  //       tmp:this.state.temp
+  //     })
+  //   });
+  //   this.getTemperature();
+  //   //console.log(result);
+  // }
+
+  changeAirConditionerState() {
+    fetch(this.api+'/change/airConditioner');
+    this.getTemperature();
+  }
+
+  changeWindowState() {
+    fetch(this.api+'/change/window');
+    this.getWindowState();
   }
 }
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor:'#F9F9F9',
+    backgroundColor: '#F9F9F9',
   },
-  img:{
-    width:290 , 
-    height:225 , 
-    marginLeft:50, 
-    marginTop:30
+  img: {
+    width: 290,
+    height: 225,
+    marginLeft: 50,
+    marginTop: 30,
   },
+  text:{fontSize:18, marginBottom:10},
   slider: {
-    width:'100%',
-    margin:10
+    width: '100%',
+    margin: 10,
   },
   device: {
-    marginBottom:1,
-    marginTop:30,
-    alignItems: "center"
+    marginBottom: 1,
+    marginTop: 30,
+    alignItems: 'center',
   },
   deg: {
-    fontSize:20,
-    fontWeight:'bold'
-  }
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
 });
 

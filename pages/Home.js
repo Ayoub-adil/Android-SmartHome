@@ -1,3 +1,7 @@
+/* eslint-disable prettier/prettier */
+/* eslint-disable keyword-spacing */
+/* eslint-disable no-trailing-spaces */
+/* eslint-disable no-unused-vars */
 import 'react-native-gesture-handler';
 import React, { Component } from 'react';
 import {
@@ -5,7 +9,7 @@ import {
   Button,
   Image,
   StyleSheet, 
-  Text
+  Text,
 } from 'react-native';
 
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -45,7 +49,7 @@ export default class Home extends Component
       })}
       tabBarOptions={{
         activeTintColor: '#007bff',
-        inactiveTintColor: '#202020'
+        inactiveTintColor: '#202020',
       }} 
       >
         <Tab.Screen name="Rooms" component={Rooms}/>
@@ -61,7 +65,7 @@ export default class Home extends Component
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor:'#F9F9F9'
-  }
+    backgroundColor:'#F9F9F9',
+  },
 });
 

@@ -1,3 +1,9 @@
+/* eslint-disable prettier/prettier */
+/* eslint-disable eqeqeq */
+/* eslint-disable react-native/no-inline-styles */
+/* eslint-disable react/self-closing-comp */
+/* eslint-disable quotes */
+/* eslint-disable keyword-spacing */
 import 'react-native-gesture-handler';
 import React, { Component } from 'react';
 import {

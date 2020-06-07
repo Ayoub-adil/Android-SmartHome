@@ -1,3 +1,11 @@
+/* eslint-disable prettier/prettier */
+/* eslint-disable space-infix-ops */
+/* eslint-disable react-native/no-inline-styles */
+/* eslint-disable semi */
+/* eslint-disable quotes */
+/* eslint-disable comma-dangle */
+/* eslint-disable no-trailing-spaces */
+/* eslint-disable no-unused-vars */
 import 'react-native-gesture-handler';
 import React, { Component , useState } from 'react';
 import {
@@ -21,90 +29,28 @@ export default class Rooms extends Component
 {
   constructor(props){
     super(props);
+    this.api='http://192.168.1.12:5000'
     this.state={
-      n_bedroom: [
-        {
-          title: "bedroom 1",
-          key: '1'
-        },
-        {
-          title: "bedroom 2",
-          key: '2'
-        }
-      ],
-      n_livingroom: [
-        {
-          title: "livingroom 1",
-          key: '1'
-        },
-        {
-          title: "livingroom 2",
-          key: '2'
-        }
-      ],
-      n_kitchen: [
-        {
-          title: "kitchen 1",
-          key: '1'
-        }
-      ]
+      plan:'homeSweetHome',
     }
+    this.getplan();
+    this.getplan=this.getplan.bind(this);
   }
-
-  list1 = () => {
-
-    return this.state.n_bedroom.map(element => {
-      return (
-        <View style = {styles.item}>
-          <Image
-         style={{width:50 , height:32}}
-         source={require('../images/bedroomN.png')}
-         ></Image>
-          <Text key={element.key} style = {styles.txt}>{element.title}</Text>
-        </View>
-      );
-    });
-  };
-
-  list2 = () => {
-    return this.state.n_livingroom.map(element => {
-      return (
-        <View style = {styles.item}>
-          <Image
-         style={{width:50 , height:40}}
-         source={require('../images/livingroomN.png')}
-         ></Image>
-          <Text key={element.key} style = {styles.txt}>{element.title}</Text>
-        </View>
-      );
-    });
-  };
-
-  list3 = () => {
-    return this.state.n_kitchen.map(element => {
-      return (
-        <View style = {styles.item}>
-          <Image
-         style={{width:50 , height:40}}
-         source={require('../images/kitchenN.png')}
-         ></Image>
-          <Text key={element.key} style = {styles.txt}>{element.title}</Text>
-        </View>
-      );
-    });
-  };
-
-  onPress=() =>
+  
+  getplan(){
+  fetch(this.api+'/home/plan').then(res=>res.json()).then(data=>{
+      this.setState({ plan: data.plan })
+      })
+  }
+  onB=() =>
   {
     this.props.navigation.navigate('Bedroom');
   }
-
-  onPress2=() =>
+  onL=() =>
   {
     this.props.navigation.navigate('livingroom');
   }
-
-  onPress3=() =>
+  onK=() =>
   {
     this.props.navigation.navigate('kitchen');
   }
@@ -124,29 +70,45 @@ export default class Rooms extends Component
 
         <ScrollView>
         <Text style = {styles.tit}>Bedrooms</Text>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={this.onPress}
-      >
-        <View>{this.list1()}</View>
-      </TouchableOpacity>
-      
-        <Text style = {styles.tit}>Livingrooms</Text>  
-      <TouchableOpacity
-        style={styles.button}
-        onPress={this.onPress2}
-      >
-        <View>{this.list2()}</View>
-      </TouchableOpacity>
-
-        <Text style = {styles.tit}>kitchen</Text> 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={this.onPress3}
-      >
-      <View>{this.list3()}</View>
-      </TouchableOpacity> 
-      </ScrollView>
+        {[...Array(this.state.plan.bedroom)].map((e,i)=>
+          <TouchableOpacity style={styles.button} onPress={this.onB}>
+            <View style = {styles.item}>
+              <Image
+                style={{width:50 , height:32}}
+                source={require('../images/bedroomN.png')}
+              />
+              <Text key={i} style = {styles.txt}>bedroom {i+1}</Text>
+            </View>
+          </TouchableOpacity>
+        )
+        }
+        <Text style = {styles.tit}>livingrooms</Text>
+        {[...Array(this.state.plan.livingroom)].map((e,i)=>
+          <TouchableOpacity style={styles.button} onPress={this.onL}>
+            <View style = {styles.item}>
+              <Image
+                style={{width:50 , height:32}}
+                source={require('../images/livingroomN.png')}
+              />
+              <Text key={i} style = {styles.txt}>livingroom {i+1}</Text>
+            </View>
+          </TouchableOpacity>
+        )
+        }
+        <Text style = {styles.tit}>kitchens</Text>
+        {[...Array(this.state.plan.kitchen)].map((e,i)=>
+          <TouchableOpacity style={styles.button} onPress={this.onK}>
+            <View style = {styles.item}>
+              <Image
+                style={{width:50 , height:32}}
+                source={require('../images/kitchenN.png')}
+              />
+              <Text key={i} style = {styles.txt}>kitchen {i+1}</Text>
+            </View>
+          </TouchableOpacity>
+        )
+        }
+        </ScrollView>
       </View>
     );
   }
